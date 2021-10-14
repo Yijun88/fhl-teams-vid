@@ -28,7 +28,7 @@ function effectParameterChanged(effectName) {
 function videoFrameHandler(videoFrame, notifyVideoProcessed) {
     for (let i = 0; i < videoFrame.data.length; i++) {
         // Invert the colors
-        videoFrame.data[i] = 255 -videoFrame.data[i];
+        videoFrame.data[i] = videoFrame.data[i];
     }
     notifyVideoProcessed();
 }
