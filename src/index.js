@@ -63,11 +63,11 @@ function effectParameterChanged(effectName) {
 
 function videoFrameHandler(videoFrame, notifyVideoProcessed) {
 
-    var mat = cv.imread(videoFrame.data);
-    console.log(mat)
-    console.log(videoFrame.data)
-    cv.line(mat, (0,0), (10,10), [0, 255, 0, 255], 1);
-    videoFrame.data =mat;
+    var mat = cv.fromarray(videoFrame.data);
+    console.log(mat.size)
+//    console.log(videoFrame.data)
+//    cv.line(mat, (0,0), (10,10), [0, 255, 0, 255], 1);
+//    videoFrame.data =mat;
 //    for (let i = 0; i < videoFrame.data.length; i++) {
 //        // Invert the colors
 //        videoFrame.data[i] = 255 -videoFrame.data[i];
