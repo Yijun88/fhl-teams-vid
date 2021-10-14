@@ -62,9 +62,15 @@ function effectParameterChanged(effectName) {
 }
 
 function videoFrameHandler(videoFrame, notifyVideoProcessed) {
+    try{
+        var mat = cv.fromarray(videoFrame.data);
+        console.log(mat.size);
+        }
+    catch(e)
+    {
+        console.log(e);
+    }
 
-    var mat = cv.fromarray(videoFrame.data);
-    console.log(mat.size)
 //    console.log(videoFrame.data)
 //    cv.line(mat, (0,0), (10,10), [0, 255, 0, 255], 1);
 //    videoFrame.data =mat;
