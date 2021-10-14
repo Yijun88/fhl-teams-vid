@@ -69,7 +69,6 @@ function videoFrameHandler(videoFrame, notifyVideoProcessed) {
         cv.line(mat, (0,0), (10,10), [0, 255, 0, 255], 1);
         videoFrame.data[i] =mat;
 }
-    }
     notifyVideoProcessed();
 }
 
