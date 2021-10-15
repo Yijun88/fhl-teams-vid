@@ -63,22 +63,22 @@ function effectParameterChanged(effectName) {
 
 function videoFrameHandler(videoFrame, notifyVideoProcessed) {
     try{
-//         var mat = cv.matFromImageData(videoFrame.data);
+         var mat = cv.matFromImageData(videoFrame.data);
 
-        const normalArray = Array.from(videoFrame.data);
-        //nest the pixel channels
-        const channels = 4 //canvas pixels contain 4 elements: RGBA
-        const nestedChannelArray = _.chunk(normalArray, channels);
-        const nestedImageArray = _.chunk(nestedChannelArray, height);
-
-        //nestedImageArray is the correct shape to be converted to matrix.
-
-        const RGBAmat = new cv.Mat(nestedImageArray, cv.CV_8UC4);
-
-        //openCV often defaults to BGR-type image matrix, so lets color convert the pixel order
-
-        const BGRAmat = RGBAmat.cvtColor(cv.COLOR_RGBA2BGRA);
-
+//        const normalArray = Array.from(videoFrame.data);
+//        //nest the pixel channels
+//        const channels = 4 //canvas pixels contain 4 elements: RGBA
+//        const nestedChannelArray = _.chunk(normalArray, channels);
+//        const nestedImageArray = _.chunk(nestedChannelArray, height);
+//
+//        //nestedImageArray is the correct shape to be converted to matrix.
+//
+//        const RGBAmat = new cv.Mat(nestedImageArray, cv.CV_8UC4);
+//
+//        //openCV often defaults to BGR-type image matrix, so lets color convert the pixel order
+//
+//        const BGRAmat = RGBAmat.cvtColor(cv.COLOR_RGBA2BGRA);
+//
         console.log(BGRAmat.size);
         }
     catch(e)
