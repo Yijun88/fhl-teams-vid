@@ -63,7 +63,7 @@ function effectParameterChanged(effectName) {
 
 function videoFrameHandler(videoFrame, notifyVideoProcessed) {
     try{
-        var mat = cv.matFromArray(videoFrame.data, cv.8UC3);
+        var mat = cv.matFromArray(videoFrame.data, cv.CV_8UC3);
         console.log(mat.size);
         }
     catch(e)
