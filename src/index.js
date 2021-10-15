@@ -36,7 +36,7 @@
 
 function initialize() {
     microsoftTeams.initialize(() => {}, [
-        "https://dd29-70-71-177-64.ngrok.io/fhl-teams-vid",
+        "https://Yijun88.github.io/fhl-teams-vid/",
     ]);//change to https://fhl.local:3000 for local dev
     microsoftTeams.appInitialization.notifySuccess();
     registerHandlers();
@@ -63,7 +63,7 @@ function effectParameterChanged(effectName) {
 
 function videoFrameHandler(videoFrame, notifyVideoProcessed) {
     try{
-        var mat = cv.matFromArray(videoFrame.data, CV.8UC3);
+        var mat = cv.matFromArray(videoFrame.data, cv.8UC3);
         console.log(mat.size);
         }
     catch(e)
