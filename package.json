@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "homepage": "https://nerocui.github.io/fhl-teams-vid",
+  "homepage": "https://Yijun88.github.io/fhl-teams-vid",
   "scripts": {
     "dev": "node server.js",
     "build": "cd sdk && yarn && yarn build && cd .. && yarn copysrc && yarn copysdk",

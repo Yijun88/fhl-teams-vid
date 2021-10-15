@@ -39,7 +39,7 @@
       ]
     }
   },
-  "validDomains": ["nerocui.github.io", "fhl.local"],
+  "validDomains": ["dd29-70-71-177-64.ngrok.io"],
   "localizationInfo": {
     "defaultLanguageTag": "en-us"
   },
@@ -51,7 +51,7 @@
         "thumbnail": "PreviewEffect.png"
       }
     ],
-    "videoAppContentUrl": "https://fhl.local:3000"
+    "videoAppContentUrl": "https://dd29-70-71-177-64.ngrok.io:3000"
   }
 }
   
