@@ -1,42 +1,72 @@
-//const canvas = document.createElement('canvas');
-//
-//function onResults(results) {
-////  canvasCtx.save();
-////  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-////  canvasCtx.drawImage(
-////      results.image, 0, 0, canvasElement.width, canvasElement.height);
-//    const canvasCts = canvas.getContext('2d')
-//    if (results.multiFaceLandmarks) {
-//        for (const landmarks of results.multiFaceLandmarks) {
-//          drawConnectors(canvasCtx, landmarks, FACEMESH_TESSELATION,
-//                         {color: '#C0C0C070', lineWidth: 1});
-//          drawConnectors(canvasCtx, landmarks, FACEMESH_RIGHT_EYE, {color: '#FF3030'});
-//          drawConnectors(canvasCtx, landmarks, FACEMESH_RIGHT_EYEBROW, {color: '#FF3030'});
-//          drawConnectors(canvasCtx, landmarks, FACEMESH_RIGHT_IRIS, {color: '#FF3030'});
-//          drawConnectors(canvasCtx, landmarks, FACEMESH_LEFT_EYE, {color: '#30FF30'});
-//          drawConnectors(canvasCtx, landmarks, FACEMESH_LEFT_EYEBROW, {color: '#30FF30'});
-//          drawConnectors(canvasCtx, landmarks, FACEMESH_LEFT_IRIS, {color: '#30FF30'});
-//          drawConnectors(canvasCtx, landmarks, FACEMESH_FACE_OVAL, {color: '#E0E0E0'});
-//          drawConnectors(canvasCtx, landmarks, FACEMESH_LIPS, {color: '#E0E0E0'});
-//    }
-//  }
-//  canvasCtx.restore();
-//}
-//
-//const faceMesh = new FaceMesh({locateFile: (file) => {
-//  return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-//}});
-//faceMesh.setOptions({
-//  maxNumFaces: 1,
-//  refineLandmarks: true,
-//  minDetectionConfidence: 0.5,
-//  minTrackingConfidence: 0.5
-//});
-//faceMesh.onResults(onResults);
+function encode(nv12, width, height) {
+    let y_mat = new cv.Mat(width, height, cv.CV_8UC1)
+    let u_mat = new cv.Mat(width/2, height/2, cv.CV_8UC1)
+    let v_mat = new cv.Mat(width/2, height/2, cv.CV_8UC1)
+    //16*2 + 8*1 + 8*1
+    for (var i = 0; i < height* width; i++) {
+        y_mat.data[i] = nv12[i];
+    }
+
+    var counter = 0;
+    for (var i = width * height; i < nv12.length; i+=2) {
+        u_mat.data[counter] = nv12[i];
+        v_mat.data[counter] = nv12[i + 1];
+        ++counter;
+    }
+    let u_mat_2 = new cv.Mat();
+    cv.resize(u_mat, u_mat_2, new cv.Size(width, height), 0, 0, cv.INTER_NEAREST);
+    let v_mat_2 = new cv.Mat();
+    cv.resize(v_mat, v_mat_2, new cv.Size(width, height), 0, 0, cv.INTER_NEAREST);
+
+    let yuv_mat = new cv.Mat(width, height, cv.CV_8UC3);
+
+	var counter = 0;
+    for (var i = 0; i < width*height; i++) {
+		yuv_mat.data[counter] = y_mat.data[i];
+		yuv_mat.data[counter+1] = u_mat_2.data[i];
+		yuv_mat.data[counter+2] = v_mat_2.data[i];
+    }
+    let dst = new cv.Mat();
+    cv.cvtColor(yuv_mat, dst, cv.COLOR_YUV2BGR, 0);
+    return dst;
+}
+
+
+function decode(bgr_mat, width, height) {
+    let yuv_mat = new cv.Mat();
+    cv.cvtColor(bgr_mat, yuv_mat, cv.COLOR_BGR2YUV, 0);
+    let y_mat = new cv.Mat(width, height, cv.CV_8UC1);
+    let u_mat = new cv.Mat(width, height, cv.CV_8UC1);
+    let v_mat = new cv.Mat(width, height, cv.CV_8UC1);
+
+    for (var i = 0; i < width * height; i++) {
+        y_mat.data[i] = yuv_mat.data[i]
+    }
+    for (var i = width * height; i < width * height*2; i++) {
+        u_mat.data[i] = yuv_mat.data[i]
+    }
+    for (var i = width * height*2; i < width * height * 3; i++) {
+        v_mat.data[i] = yuv_mat.data[i]
+    }
+    let u_mat_2 = new cv.Mat(width / 2, height / 2, cv.CV_8UC1);
+    let v_mat_2 = new cv.Mat(width / 2, height / 2, cv.CV_8UC1);
+    cv.resize(u_mat, u_mat_2, new cv.Size(width / 2, height / 2), 0, 0, cv.INTER_AREA);
+    cv.resize(v_mat, v_mat_2, new cv.Size(width / 2, height / 2), 0, 0, cv.INTER_AREA);
+    let array_1d = [];
+    for (var i = 0; i < y_mat.data.length; i++) {
+        array_1d.push(y_mat.data[i]);
+    }
+    for(var i = 0; i < u_mat_2.data.length; i++) {
+        array_1d.push(u_mat_2.data[i]);
+        array_1d.push(v_mat_2.data[i]);
+    }
+    let x = new Uint8ClampedArray(array_1d);
+    return x
+}
 
 function initialize() {
     microsoftTeams.initialize(() => {}, [
-        "https://Yijun88.github.io/fhl-teams-vid/",
+        "https://nerocui.github.io/fhl-teams-vid",
     ]);//change to https://fhl.local:3000 for local dev
     microsoftTeams.appInitialization.notifySuccess();
     registerHandlers();
@@ -61,43 +91,23 @@ function effectParameterChanged(effectName) {
     console.log(`Parameter changed. ${effectName}`);
 }
 
+
 function videoFrameHandler(videoFrame, notifyVideoProcessed) {
-    try{
-         var mat = cv.matFromImageData(videoFrame.data);
-
-//        const normalArray = Array.from(videoFrame.data);
-//        //nest the pixel channels
-//        const channels = 4 //canvas pixels contain 4 elements: RGBA
-//        const nestedChannelArray = _.chunk(normalArray, channels);
-//        const nestedImageArray = _.chunk(nestedChannelArray, height);
-//
-//        //nestedImageArray is the correct shape to be converted to matrix.
-//
-//        const RGBAmat = new cv.Mat(nestedImageArray, cv.CV_8UC4);
-//
-//        //openCV often defaults to BGR-type image matrix, so lets color convert the pixel order
-//
-//        const BGRAmat = RGBAmat.cvtColor(cv.COLOR_RGBA2BGRA);
-//
-        console.log(BGRAmat.size);
+    try {
+        const mat = encode(videoFrame.data, videoFrame.width, videoFrame.height);
+        if (!mat) return;
+        cv.line(mat, new cv.Point(0, 0), new cv.Point(100, 100), [255, 255, 255, 255], 10);
+        const res = decode(mat, videoFrame.width, videoFrame.height);
+        for (var i = 0; i < videoFrame.data.length; i++) {
+            videoFrame.data[i] = res[i];
         }
-    catch(e)
-    {
-        console.log(e);
+    } catch (err) {
+        console.log(err);
     }
-
-//    console.log(videoFrame.data)
-//    cv.line(mat, (0,0), (10,10), [0, 255, 0, 255], 1);
-//    videoFrame.data =mat;
-//    for (let i = 0; i < videoFrame.data.length; i++) {
-//        // Invert the colors
-//        videoFrame.data[i] = 255 -videoFrame.data[i];
-//
-//}
+    
     notifyVideoProcessed();
 }
 
-
-
-
-initialize();
+cv['onRuntimeInitialized'] = function() {
+    initialize();
+}
